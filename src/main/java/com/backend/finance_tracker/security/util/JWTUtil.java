@@ -1,6 +1,8 @@
 package com.backend.finance_tracker.security.util;
 
 
+import com.backend.finance_tracker.entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -27,16 +29,34 @@ public class JWTUtil {
         key = Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateToken(String email,String password){
+    public String generateToken(String email){
 
         return Jwts.builder()
                 .setSubject(email)
-                .setSubject(password)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
 
+    public String extractEmail(String token){
+        return extractClaims(token).getSubject();
+    }
+
+    private Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public boolean validateToken(String email, User user,String token){
+        return email.equals(user.getEmail()) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractClaims(token).getExpiration().before(new Date());
     }
 
 }

@@ -34,7 +34,7 @@ public class AuthenticationController {
                 return "User doesn't exist";
             }
 
-            return jwtUtil.generateToken(authRequest.getEmail(),authRequest.getPassword());
+            return jwtUtil.generateToken(authRequest.getEmail());
         }catch (Exception e){
             e.printStackTrace();
             return "Exception occurred while generating token";
