@@ -2,6 +2,7 @@ package com.backend.finance_tracker.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +15,13 @@ import com.backend.finance_tracker.entity.Role;
 import com.backend.finance_tracker.entity.User;
 import com.backend.finance_tracker.service.UserService;
 
-import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api")
 public class UserController {
 
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers() {
