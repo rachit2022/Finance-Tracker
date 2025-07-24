@@ -45,14 +45,7 @@ public class TransactionService {
                 return ResponseEntity.badRequest().body("Transaction type cannot be empty");
             }
 
-            Transaction transaction=new Transaction();
-            transaction.setTransactionDate(transactionDto.getTransactionDate());
-            transaction.setAccount(transactionDto.getAccount());
-            transaction.setAmount(transactionDto.getAmount());
-            transaction.setNote(transactionDto.getNote());
-            transaction.setCategory(transactionDto.getCategory());
-            transaction.setUserId(userId);
-            transaction.setTransactionType(transactionDto.getTransactionType());
+            Transaction transaction = getTransaction(userId, transactionDto);
             transactionRepository.save(transaction);
             return ResponseEntity.ok("Transaction added successfully");
 
@@ -60,6 +53,18 @@ public class TransactionService {
             return ResponseEntity.badRequest().body("Wrong userId has been passed");
         }
 
+    }
+
+    private static Transaction getTransaction(long userId, TransactionDto transactionDto) {
+        Transaction transaction=new Transaction();
+        transaction.setTransactionDate(transactionDto.getTransactionDate());
+        transaction.setAccount(transactionDto.getAccount());
+        transaction.setAmount(transactionDto.getAmount());
+        transaction.setNote(transactionDto.getNote());
+        transaction.setCategory(transactionDto.getCategory());
+        transaction.setUserId(userId);
+        transaction.setTransactionType(transactionDto.getTransactionType());
+        return transaction;
     }
 
 }
