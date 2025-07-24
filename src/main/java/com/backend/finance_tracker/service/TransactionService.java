@@ -45,7 +45,7 @@ public class TransactionService {
                 return ResponseEntity.badRequest().body("Transaction type cannot be empty");
             }
 
-            Transaction transaction = getTransaction(userId, transactionDto);
+            Transaction transaction = getTransactions(userId, transactionDto);
             transactionRepository.save(transaction);
             return ResponseEntity.ok("Transaction added successfully");
 
@@ -55,7 +55,7 @@ public class TransactionService {
 
     }
 
-    private static Transaction getTransaction(long userId, TransactionDto transactionDto) {
+    private static Transaction getTransactions(long userId, TransactionDto transactionDto) {
         Transaction transaction=new Transaction();
         transaction.setTransactionDate(transactionDto.getTransactionDate());
         transaction.setAccount(transactionDto.getAccount());
