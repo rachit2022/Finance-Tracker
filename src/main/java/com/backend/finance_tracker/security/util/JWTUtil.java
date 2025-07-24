@@ -22,20 +22,31 @@ public class JWTUtil {
     private SecretKey key;
 
 
-    private final long EXPIRATION_TIME = 1000*60*60; // hour
+    private final long ACCESS_TOKEN_EXPIRATION_TIME = 1000 * 60 * 15;      // 15 minutes
+    private final long REFRESH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 hours
+
 
     @PostConstruct
     public void init() {
         key = Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateToken(String email){
+    public String generateAccessToken(String email){
 
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(String email){
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
+                .signWith(key,SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -51,11 +62,19 @@ public class JWTUtil {
                 .getBody();
     }
 
-    public boolean validateToken(String email, User user,String token){
-        return email.equals(user.getEmail()) && !isTokenExpired(token);
+    public boolean validateAccessToken(String email, User user,String token){
+        return email.equals(user.getEmail()) && !isAccessTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    private boolean isAccessTokenExpired(String token) {
+        return extractClaims(token).getExpiration().before(new Date());
+    }
+
+    public boolean validateRefreshToken(String email, User user,String token){
+        return email.equals(user.getEmail()) && !isRefreshTokenExpired(token);
+    }
+
+    private boolean isRefreshTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
     }
 
