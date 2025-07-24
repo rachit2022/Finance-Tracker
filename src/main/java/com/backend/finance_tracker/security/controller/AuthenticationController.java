@@ -8,7 +8,7 @@ import com.backend.finance_tracker.security.util.JWTUtil;
 import com.backend.finance_tracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +23,7 @@ public class AuthenticationController {
     @Autowired
     private JWTUtil jwtUtil;
 
-    @PostMapping("/authenticate")
+    @GetMapping("/authenticate")
     public ResponseEntity<TokenDTO> generateToken(@RequestBody AuthRequest authRequest){
         TokenDTO dto=new TokenDTO();
         try{

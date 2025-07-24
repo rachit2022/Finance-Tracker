@@ -58,4 +58,8 @@ public class UserService{
         return userRepository.authenticateUser(email,password);
     }
 
+    public Optional<User> findByUserId(long id){
+        return userRepository.findByUserId(id);
+    }
+
 }
