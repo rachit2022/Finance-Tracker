@@ -5,11 +5,14 @@ import com.backend.finance_tracker.entity.Transaction;
 import com.backend.finance_tracker.entity.User;
 import com.backend.finance_tracker.repository.TransactionRepository;
 import com.backend.finance_tracker.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -20,6 +23,7 @@ public class TransactionService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public ResponseEntity<String> addNewTransaction(long userId, TransactionDto transactionDto){
         Optional<User> user=userRepository.findByUserId(userId);
 
@@ -65,6 +69,45 @@ public class TransactionService {
         transaction.setUserId(userId);
         transaction.setTransactionType(transactionDto.getTransactionType());
         return transaction;
+    }
+
+    @Transactional
+    public ResponseEntity<String> updateTransaction(long transactionId,TransactionDto transactiondto){
+
+            Transaction existingTransaction = transactionRepository.getTransaction(transactionId);
+            if(existingTransaction!=null){
+                existingTransaction.setTransactionType(transactiondto.getTransactionType());
+                existingTransaction.setTransactionDate(transactiondto.getTransactionDate());
+                existingTransaction.setNote(transactiondto.getNote());
+                existingTransaction.setAmount(transactiondto.getAmount());
+                existingTransaction.setCategory(transactiondto.getCategory());
+                existingTransaction.setAccount(transactiondto.getAccount());
+                transactionRepository.save(existingTransaction);
+                return ResponseEntity.ok().body("Transaction Updated Successfully");
+            }else{
+                return ResponseEntity.badRequest().body("Transaction not present with the provided transactionId");
+            }
+    }
+
+    public ResponseEntity<Transaction> getTransaction(long transactionId){
+        Transaction transaction=transactionRepository.getTransaction(transactionId);
+        return ResponseEntity.ok().body(transaction);
+
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteTransaction(List<Long> transactionIds){
+        if(transactionIds==null || transactionIds.isEmpty()){
+            return ResponseEntity.badRequest().body("No transactionId's were provided.");
+        }
+        int batchSize = 1000;
+        int total = transactionIds.size();
+
+        for (int i = 0; i < total; i += batchSize) {
+            List<Long> batch = transactionIds.subList(i, Math.min(i + batchSize, total));
+            transactionRepository.deleteTransaction(batch);
+        }
+        return ResponseEntity.ok().body("Your transaction has been deleted successfully");
     }
 
 }
