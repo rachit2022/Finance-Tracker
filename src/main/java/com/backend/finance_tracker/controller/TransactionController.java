@@ -5,9 +5,11 @@ import com.backend.finance_tracker.dto.TransactionDto;
 import com.backend.finance_tracker.entity.Transaction;
 import com.backend.finance_tracker.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,4 +66,26 @@ public class TransactionController {
         }
     }
 
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<Transaction>> getFilteredTransactions(
+            @RequestParam long userId,
+
+            @RequestParam(required = false) String transactionType,
+            @RequestParam(required = false) String transactionCategory,
+            @RequestParam(required = false) String transactionAccount,
+
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate
+    ) {
+        try {
+            return transactionService.getFilteredTransactions(userId, transactionType, transactionCategory, transactionAccount, fromDate, toDate);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
+
+
 }
+
+

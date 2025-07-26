@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -109,5 +110,46 @@ public class TransactionService {
         }
         return ResponseEntity.ok().body("Your transaction has been deleted successfully");
     }
+
+    public ResponseEntity<List<Transaction>> getFilteredTransactions(
+            long userId,
+            String transactionType,
+            String transactionCategory,
+            String transactionAccount,
+            Date fromDate,
+            Date toDate
+    ) {
+        List<Transaction> transactions = transactionRepository.findByUserId(userId);
+
+        if (transactionType != null && !transactionType.isEmpty()) {
+            transactions = transactions.stream()
+                    .filter(t -> t.getTransactionType().equalsIgnoreCase(transactionType))
+                    .collect(Collectors.toList());
+        }
+
+        if (transactionCategory != null && !transactionCategory.isEmpty()) {
+            transactions = transactions.stream()
+                    .filter(t -> t.getCategory().equalsIgnoreCase(transactionCategory))
+                    .collect(Collectors.toList());
+        }
+
+        if (transactionAccount != null && !transactionAccount.isEmpty()) {
+            transactions = transactions.stream()
+                    .filter(t -> t.getAccount().equalsIgnoreCase(transactionAccount))
+                    .collect(Collectors.toList());
+        }
+
+        if (fromDate != null || toDate != null) {
+            Date finalFrom = fromDate != null ? fromDate : new Date(0);
+            Date finalTo = toDate != null ? toDate : new Date();
+
+            transactions = transactions.stream()
+                    .filter(t -> !t.getTransactionDate().before(finalFrom) && !t.getTransactionDate().after(finalTo))
+                    .collect(Collectors.toList());
+        }
+
+        return ResponseEntity.ok().body(transactions);
+    }
+
 
 }
