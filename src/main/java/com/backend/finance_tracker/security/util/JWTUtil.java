@@ -62,9 +62,15 @@ public class JWTUtil {
                 .getBody();
     }
 
-    public boolean validateAccessToken(String email, User user,String token){
-        return email.equals(user.getEmail()) && !isAccessTokenExpired(token);
+    public boolean validateAccessToken(String token) {
+        try {
+            Claims claims = extractClaims(token);
+            return !claims.getExpiration().before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
     }
+
 
     private boolean isAccessTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
